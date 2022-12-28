@@ -8,7 +8,7 @@ function App() {
 
   return (
     <div className="App h-screen p-8">
-      <div className="bg-gray-100 p-8 h-full">
+      <div className="bg-green-50 rounded-xl p-8 h-full">
         <AblyConnect />
       </div>
     </div>

@@ -4,8 +4,8 @@ import ably from "../utils/ably-connection";
 import { ChannelHistory } from "./channel-history";
 
 export const AblyConnect = () => {
-  const [status, setStatus] = useState("Connecting...");
-  const [history, setHistory] = useState("Waiting for message...");
+  const [status, setStatus] = useState(false);
+  const [history, setHistory] = useState("...");
   const [payload, setPayload] = useState("");
   const CHANNEL = "quickstart";
 
@@ -14,7 +14,7 @@ export const AblyConnect = () => {
   const ablyRealtimePromiseExample = async () => {
     // Connect to Ably
     await ably.connection.once("connected");
-    setStatus("Connected to System!");
+    setStatus(true);
 
     /* 
         Subscribe to a channel. 
@@ -26,8 +26,8 @@ export const AblyConnect = () => {
       setHistory(message.data);
     });
 
-    // Publish a message
-    await channel.publish(CHANNEL, "hello");
+    // // Publish a message
+    // await channel.publish(CHANNEL, "hello");
   };
 
   ablyRealtimePromiseExample();
@@ -41,21 +41,30 @@ export const AblyConnect = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="uppercase text-sm font-bold">{status}</div>
+      <div
+        className={
+          "uppercase text-sm font-bold " +
+          (status ? "text-green-400" : "text-yellow-500")
+        }
+      >
+        {status ? "Connected" : "Connecting..."}
+      </div>
 
       <div className="flex-grow">
         <ChannelHistory channel={CHANNEL} history={history} />
       </div>
 
-      <form onSubmit={onSubmit} className="w-full flex h-16 gap-8">
+      <form onSubmit={onSubmit} className="w-full grid md:grid-cols-4 gap-4">
         <input
           type="text"
           value={payload}
           onChange={(e) => setPayload(e.target.value)}
           placeholder="Type a message..."
-          className="w-3/4 p-3 text-xl"
+          className="p-3 text-xl w-full md:col-span-3"
         />
-        <button className="w-1/4 border text-xl uppercase font-bold text-white rounded-lg bg-green-500">Send</button>
+        <button className="border py-2  w-full md:text-xl uppercase font-bold text-white rounded-lg bg-green-500">
+          Send
+        </button>
       </form>
     </div>
   );

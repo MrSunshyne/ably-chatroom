@@ -13,10 +13,18 @@ export const ChannelHistory = ({ channel, history }: ChannelHistoryProps) => {
 
   return (
     <div>
-      <div className="text-xl uppercase py-10">chat log</div>
-      {localHistory.reverse().map((history, index) => (
-        <div key={index}>{history}</div>
-      ))}
+      <div className="flex flex-col gap-2 pt-8">
+        {localHistory.reverse().map((history, index) => (
+          <div>
+            <div
+              className="rounded-md bg-green-300 inline-block p-2"
+              key={index}
+            >
+              {history}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
