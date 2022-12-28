@@ -11,13 +11,12 @@ export const AblyConnect = () => {
 
   const channel = ably.channels.get(CHANNEL);
 
-
   const ablyRealtimePromiseExample = async () => {
     // Connect to Ably
     await ably.connection.once("connected");
     setStatus("Connected to System!");
 
-       /* 
+    /* 
         Subscribe to a channel. 
         The promise resolves when the channel is attached 
         (and resolves synchronously if the channel is already attached).
@@ -34,23 +33,30 @@ export const AblyConnect = () => {
   ablyRealtimePromiseExample();
 
   const onSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();    
+    e.preventDefault();
     console.log(payload);
     await channel.publish(CHANNEL, payload);
+    setPayload("");
   };
 
   return (
-    <div>
-      <div>{status}</div>
-      <div>{history}</div>
-      <div>{payload}</div>
-      <form onSubmit={onSubmit}>
-        {/* Input Box in React */}
-        <input type="text" onChange={(e) => setPayload(e.target.value)} />
-        <button>Send</button>
+    <div className="h-full flex flex-col">
+      <div className="uppercase text-sm font-bold">{status}</div>
+
+      <div className="flex-grow">
+        <ChannelHistory channel={CHANNEL} history={history} />
+      </div>
+
+      <form onSubmit={onSubmit} className="w-full flex h-16 gap-8">
+        <input
+          type="text"
+          value={payload}
+          onChange={(e) => setPayload(e.target.value)}
+          placeholder="Type a message..."
+          className="w-3/4 p-3 text-xl"
+        />
+        <button className="w-1/4 border text-xl uppercase font-bold text-white rounded-lg bg-green-500">Send</button>
       </form>
-      
-      <ChannelHistory channel={CHANNEL} history={history} />
     </div>
   );
 };
