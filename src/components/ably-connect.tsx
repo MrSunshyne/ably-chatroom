@@ -1,57 +1,59 @@
+import {
+  useChannel,
+  provideSdkInstance,
+  usePresence,
+} from "@ably-labs/react-hooks";
 import React from "react";
 import { useState } from "react";
-import ably from "../utils/ably-connection";
 import { ChannelHistory } from "./channel-history";
-
+import { ChannelsList } from "./channels-list";
+interface MyPresenceType {
+  foo: string;
+}
 export const AblyConnect = () => {
+  const CHANNEL_NAME = "quickstart";
   const [status, setStatus] = useState(false);
-  const [history, setHistory] = useState("...");
-  const [payload, setPayload] = useState("");
-  const CHANNEL = "quickstart";
+  const [payload, setPayload] = useState(
+    Math.random().toString(36).substring(7)
+  );
 
-  const channel = ably.channels.get(CHANNEL);
+  const [channel] = useChannel(CHANNEL_NAME, (message) => {});
 
-  const ablyRealtimePromiseExample = async () => {
-    // Connect to Ably
-    await ably.connection.once("connected");
-    setStatus(true);
+  const TypedUsePresenceComponent = () => {
+    // In this example MyPresenceType will be checked - if omitted, the shape of the initial
+    // value will be used ...and if that's omitted, `any` will be the default.
 
-    /* 
-        Subscribe to a channel. 
-        The promise resolves when the channel is attached 
-        (and resolves synchronously if the channel is already attached).
-    */
+    const [val] = usePresence<MyPresenceType>(CHANNEL_NAME);
 
-    await channel.subscribe(CHANNEL, (message) => {
-      setHistory(message.data);
-    });
-
-    // // Publish a message
-    // await channel.publish(CHANNEL, "hello");
+    return <div role="presence">{JSON.stringify(val)}</div>;
   };
 
-  ablyRealtimePromiseExample();
-
-  const onSubmit = async (e: React.SyntheticEvent) => {
+  const onSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    console.log(payload);
-    await channel.publish(CHANNEL, payload);
+    channel.publish(CHANNEL_NAME, payload);
     setPayload("");
   };
 
   return (
     <div className="h-full flex flex-col">
-      <div
+      {/* <div
         className={
           "uppercase text-sm font-bold " +
           (status ? "text-green-400" : "text-yellow-500")
         }
       >
         {status ? "Connected" : "Connecting..."}
-      </div>
+      </div> */}
+
+      {/* <div>
+        <ChannelsList />
+      </div> */}
+
+      <div className="bg-green-500">{TypedUsePresenceComponent()}</div>
 
       <div className="flex-grow">
-        <ChannelHistory channel={CHANNEL} history={history} />
+        <ChannelHistory channelName={CHANNEL_NAME} />
+        {/* {messagePreviews()} */}
       </div>
 
       <form onSubmit={onSubmit} className="w-full grid md:grid-cols-4 gap-4">

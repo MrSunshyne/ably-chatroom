@@ -1,23 +1,47 @@
-import { useEffect, useState } from "react";
+import { Types } from "ably";
+import { useEffect, useMemo, useState } from "react";
+import { configureAbly, useChannel } from "@ably-labs/react-hooks";
+import { ChatHistory } from "./chat-history";
 
 type ChannelHistoryProps = {
-  channel: any;
-  history: string;
+  channelName: string;
 };
-export const ChannelHistory = ({ channel, history }: ChannelHistoryProps) => {
-  const [localHistory, setLocalHistory] = useState<string[]>([]);
+export const ChannelHistory = ({ channelName }: ChannelHistoryProps) => {
+  const [messages, updateMessages] = useState<Types.Message[]>([]);
 
-  useEffect(() => {
-    setLocalHistory([...localHistory, history]);
-  }, [history]);
+  const [channel] = useChannel(channelName, (message) => {
+    updateMessages((prev: Types.Message[]) => [...prev, message]);
+  });
 
+  useMemo(() => {
+    channel.history((err, result) => {
+      if (result && result?.items.length === 0) {
+        console.log("No messages found");
+        return;
+      }
+      console.log("History found");
+      console.log(result);
+      result && updateMessages(result.items);
+
+      if (err) {
+        console.log(err);
+      }
+    });
+  }, [channel]);
+
+  // Convert the messages to list items to render in a react component
   return (
     <div>
       <div className="flex flex-col gap-2 pt-8">
-        {localHistory.reverse().map((history, index) => (
-          <div key={index}>
+        {messages.map((msg: Types.Message, index) => (
+          <div key={msg.id}>
             <div className="rounded-md bg-green-300 inline-block p-2">
-              {history}
+              {/* <pre>
+                <code>{JSON.stringify(msg, null, 2)}</code>
+              </pre> */}
+              <div className="text-xs uppercase font-bold">{msg.clientId} says: </div>
+
+              <div className="text-xl">{msg.data}</div>
             </div>
           </div>
         ))}
