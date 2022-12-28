@@ -7,7 +7,7 @@ function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <div className="App h-screen p-8">
+    <div className="App h-full p-8">
       <div className="bg-green-50 rounded-xl p-8 h-full">
         <AblyConnect />
       </div>
