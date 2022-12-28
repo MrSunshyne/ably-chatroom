@@ -15,11 +15,8 @@ export const ChannelHistory = ({ channel, history }: ChannelHistoryProps) => {
     <div>
       <div className="flex flex-col gap-2 pt-8">
         {localHistory.reverse().map((history, index) => (
-          <div>
-            <div
-              className="rounded-md bg-green-300 inline-block p-2"
-              key={index}
-            >
+          <div key={index}>
+            <div className="rounded-md bg-green-300 inline-block p-2">
               {history}
             </div>
           </div>
