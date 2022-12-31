@@ -48,11 +48,11 @@ export const AblyConnect = () => {
         <ChannelsList />
       </div> */}
 
-      <div>
+      {/* <div>
         {JSON.stringify(user)} {isLogged ? "logged" : "not logged"}
-      </div>
+      </div> */}
 
-      <div className="bg-green-500">{TypedUsePresenceComponent()}</div>
+      {/* <div className="bg-green-500">{TypedUsePresenceComponent()}</div> */}
 
       <div className="flex-grow">
         <ChannelHistory channelName={CHANNEL_NAME} />
