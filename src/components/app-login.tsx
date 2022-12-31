@@ -5,14 +5,15 @@ import { defaultUser, UserContext } from "../contexts/UserContext";
 export const AppLogin = () => {
   const { user, setUser, logout, isLogged } = useContext(UserContext);
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState("MrSunshyne");
 
   const generateClientId = Math.random().toString(36).substring(7);
 
   const handleSetUser = (e: React.SyntheticEvent) => {
     e.preventDefault();
     setUser({
-      name: name,
+      ...user,
+      name,
       clientId: generateClientId,
     });
 

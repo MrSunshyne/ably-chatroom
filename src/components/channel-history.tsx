@@ -9,6 +9,7 @@ type ChannelHistoryProps = {
 };
 export const ChannelHistory = ({ channelName }: ChannelHistoryProps) => {
   const [messages, updateMessages] = useState<Types.Message[]>([]);
+  const { user } = useContext(UserContext);
 
   const [channel] = useChannel(channelName, (message) => {
     updateMessages((prev: Types.Message[]) => [...prev, message]);
@@ -20,8 +21,6 @@ export const ChannelHistory = ({ channelName }: ChannelHistoryProps) => {
         console.log("No messages found");
         return;
       }
-      console.log("History found");
-      console.log(result);
       result && updateMessages(result.items);
 
       if (err) {
@@ -30,34 +29,43 @@ export const ChannelHistory = ({ channelName }: ChannelHistoryProps) => {
     });
   }, [channel]);
 
-  const { user, setUser } = useContext(UserContext);
+  const renderChatBubble = (msg: Types.Message) => {
+    const message = msg.data?.message || "";
+    const name = msg.data?.name || "";
 
-  const handleSetUser = () => {
-    setUser({
-      name: "Saamiyah",
-      clientId: "je taime",
-    });
+    const isRich = typeof msg.data === "object";
+    const isCurrentUser = msg.clientId === user.clientId;
+
+    return isRich ? (
+      <div className="flex">
+        <div
+          className={
+            "rounded-md p-2 flex" +
+            (isCurrentUser ? " bg-green-300" : " bg-pink-300 justify-end")
+          }
+        >
+          <div className="flex flex-col gap-2">
+            <div className="rounded-md  inline-block p-2">
+              <div className="text-xs uppercase font-bold">{name} says: </div>
+
+              <div className="text-xl" title={JSON.stringify(msg.data)}>
+                {message}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div className="text-xl">{JSON.stringify(msg.data)}</div>
+    );
   };
 
   // Convert the messages to list items to render in a react component
   return (
     <div>
-      <button onClick={handleSetUser}>relog</button>
-
       <div className="flex flex-col gap-2 pt-8">
         {messages.map((msg: Types.Message, index) => (
-          <div key={msg.id}>
-            <div className="rounded-md bg-green-300 inline-block p-2">
-              {/* <pre>
-                <code>{JSON.stringify(msg, null, 2)}</code>
-              </pre> */}
-              <div className="text-xs uppercase font-bold">
-                {msg.clientId} says:{" "}
-              </div>
-
-              <div className="text-xl">{msg.data}</div>
-            </div>
-          </div>
+          <>{renderChatBubble(msg)}</>
         ))}
       </div>
     </div>

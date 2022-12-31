@@ -1,9 +1,4 @@
-import {
-  useChannel,
-  provideSdkInstance,
-  usePresence,
-  configureAbly,
-} from "@ably-labs/react-hooks";
+import { useChannel, usePresence } from "@ably-labs/react-hooks";
 import React, { useContext } from "react";
 import { useState } from "react";
 import { UserContext } from "../contexts/UserContext";
@@ -13,14 +8,17 @@ interface MyPresenceType {
   foo: string;
 }
 
-configureAbly({
-  key: import.meta.env.VITE_APP_ABLY_API_KEY,
-  clientId: Math.random().toString(36).substring(7),
-});
-
 export const AblyConnect = () => {
-  const CHANNEL_NAME = "quickstart";
-  const [status, setStatus] = useState(false);
+
+  const { user, setUser, logout, isLogged, getActiveChannel } = useContext(UserContext);
+  const CHANNEL_NAME = user.activeChannel;
+  if (!CHANNEL_NAME) return (
+    <div>
+      Channel Name Not Set 
+    </div>
+
+  );
+
   const [payload, setPayload] = useState(
     Math.random().toString(36).substring(7)
   );
@@ -28,33 +26,24 @@ export const AblyConnect = () => {
   const [channel] = useChannel(CHANNEL_NAME, (message) => {});
 
   const TypedUsePresenceComponent = () => {
-    // In this example MyPresenceType will be checked - if omitted, the shape of the initial
-    // value will be used ...and if that's omitted, `any` will be the default.
-
     const [val] = usePresence<MyPresenceType>(CHANNEL_NAME);
 
     return <div role="presence">{JSON.stringify(val)}</div>;
   };
 
-  const { user, setUser, logout, isLogged } = useContext(UserContext);
 
   const onSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    channel.publish(CHANNEL_NAME, payload);
+    channel.publish(CHANNEL_NAME, {
+      message: payload,
+      clientId: user.clientId,
+      name: user.name,
+    });
     setPayload("");
   };
 
   return (
     <div className="h-full flex flex-col">
-      {/* <div
-        className={
-          "uppercase text-sm font-bold " +
-          (status ? "text-green-400" : "text-yellow-500")
-        }
-      >
-        {status ? "Connected" : "Connecting..."}
-      </div> */}
-
       {/* <div>
         <ChannelsList />
       </div> */}

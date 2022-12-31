@@ -14,10 +14,14 @@ export const AppGuardProvider = ({ children }: AppGuardProviderProps) => {
     setUser(defaultUser);
   };
 
+  const getActiveChannel = () => {
+    return user.activeChannel;
+  };
+
   const isLogged = user.name !== null;
 
   const providerValue = useMemo(
-    () => ({ user, setUser, logout, isLogged }),
+    () => ({ user, setUser, logout, isLogged, getActiveChannel }),
     [user, setUser]
   );
 
