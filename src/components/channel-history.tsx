@@ -1,7 +1,8 @@
 import { Types } from "ably";
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { configureAbly, useChannel } from "@ably-labs/react-hooks";
 import { ChatHistory } from "./chat-history";
+import { UserContext } from "../contexts/UserContext";
 
 type ChannelHistoryProps = {
   channelName: string;
@@ -29,9 +30,20 @@ export const ChannelHistory = ({ channelName }: ChannelHistoryProps) => {
     });
   }, [channel]);
 
+  const { user, setUser } = useContext(UserContext);
+
+  const handleSetUser = () => {
+    setUser({
+      name: "Saamiyah",
+      clientId: "je taime",
+    });
+  };
+
   // Convert the messages to list items to render in a react component
   return (
     <div>
+      <button onClick={handleSetUser}>relog</button>
+
       <div className="flex flex-col gap-2 pt-8">
         {messages.map((msg: Types.Message, index) => (
           <div key={msg.id}>
@@ -39,7 +51,9 @@ export const ChannelHistory = ({ channelName }: ChannelHistoryProps) => {
               {/* <pre>
                 <code>{JSON.stringify(msg, null, 2)}</code>
               </pre> */}
-              <div className="text-xs uppercase font-bold">{msg.clientId} says: </div>
+              <div className="text-xs uppercase font-bold">
+                {msg.clientId} says:{" "}
+              </div>
 
               <div className="text-xl">{msg.data}</div>
             </div>

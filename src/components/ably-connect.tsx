@@ -2,14 +2,22 @@ import {
   useChannel,
   provideSdkInstance,
   usePresence,
+  configureAbly,
 } from "@ably-labs/react-hooks";
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
+import { UserContext } from "../contexts/UserContext";
 import { ChannelHistory } from "./channel-history";
-import { ChannelsList } from "./channels-list";
+
 interface MyPresenceType {
   foo: string;
 }
+
+configureAbly({
+  key: import.meta.env.VITE_APP_ABLY_API_KEY,
+  clientId: Math.random().toString(36).substring(7),
+});
+
 export const AblyConnect = () => {
   const CHANNEL_NAME = "quickstart";
   const [status, setStatus] = useState(false);
@@ -27,6 +35,8 @@ export const AblyConnect = () => {
 
     return <div role="presence">{JSON.stringify(val)}</div>;
   };
+
+  const { user, setUser, logout, isLogged } = useContext(UserContext);
 
   const onSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -49,12 +59,18 @@ export const AblyConnect = () => {
         <ChannelsList />
       </div> */}
 
+      <div>
+        {JSON.stringify(user)} {isLogged ? "logged" : "not logged"}
+      </div>
+
       <div className="bg-green-500">{TypedUsePresenceComponent()}</div>
 
       <div className="flex-grow">
         <ChannelHistory channelName={CHANNEL_NAME} />
         {/* {messagePreviews()} */}
       </div>
+
+      <button onClick={logout}>logout</button>
 
       <form onSubmit={onSubmit} className="w-full grid md:grid-cols-4 gap-4">
         <input
